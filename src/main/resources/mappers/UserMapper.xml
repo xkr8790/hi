@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dev.itjung.matzip.mappers.UserMapper">
+    <insert id="insertRegisterContactCode"
+            useGeneratedKeys="true"
+            keyColumn="index"
+            keyProperty="index"
+            parameterType="dev.itjung.matzip.entities.RegisterContactCodeEntity">
+        INSERT INTO `matzip`.`register_contact_codes` (`contact`, `code`, `salt`, `created_at`, `expires_at`, `expired_flag`)
+        VALUES (#{contact},
+                #{code},
+                #{salt},
+                IFNULL(#{createdAt}, DEFAULT(`created_at`)),
+                #{expiresAt},
+                IFNULL(#{isExpired}, DEFAULT(`expired_flag`)))
+    </insert>
+    <insert id="insertRecoverContactCode"
+    useGeneratedKeys="true"
+    keyColumn="index"
+    keyProperty="index"
+    parameterType="dev.itjung.matzip.entities.RecoverContactCodeEntity">
+        INSERT INTO `matzip`.`recover_contact_codes` (`contact`, `code`, `salt`, `created_at`, `expires_at`, `expired_flag`)
+        VALUES (#{contact},
+                #{code},
+                #{salt},
+                IFNULL(#{createdAt}, DEFAULT(`created_at`)),
+                #{expiresAt},
+                IFNULL(#{isExpired}, DEFAULT(`expired_flag`)))
+    </insert>
+
+    <insert id="insertUser"
+            parameterType="dev.itjung.matzip.entities.UserEntity">
+        INSERT INTO `matzip`.`users`(email, password, nickname, contact, status, admin_flag, registered_at)
+            VALUE (#{email},
+                   #{password},
+                   #{nickname},
+                   #{contact},
+                   #{status},
+                   #{isAdmin},
+                   IFNULL(#{registeredAt}, DEFAULT(`registered_at`)))
+
+    </insert>
+    <insert id="insertRegisterEmailCode"
+            parameterType="dev.itjung.matzip.entities.RegisterEmailCodeEntity">
+        INSERT INTO `matzip`.`register_email_codes`(email, code, salt, created_at, expires_at, expired_flag)
+            VALUE (#{email},
+                   #{code},
+                   #{salt},
+                   IFNULL(#{createdAt}, DEFAULT(`created_at`)),
+                   #{expiresAt},
+                   #{isExpired})
+    </insert>
+
+    <select id="selectUserByEmail" resultType="dev.itjung.matzip.entities.UserEntity">
+        SELECT `email`         AS `email`,
+               `password`      AS `password`,
+               `nickname`      AS `nickname`,
+               `contact`       AS `contact`,
+               `status`        AS `status`,
+               `admin_flag`    AS `isAdmin`,
+               `registered_at` AS `registeredAt`
+        FROM `matzip`.`users`
+        WHERE BINARY `email` = #{email}
+        LIMIT 1
+    </select>
+
+    <select id="selectUserByNickName" resultType="dev.itjung.matzip.entities.UserEntity">
+        SELECT `email`         AS `email`,
+               `password`      AS `password`,
+               `nickname`      AS `nickname`,
+               `contact`       AS `contact`,
+               `status`        AS `status`,
+               `admin_flag`    AS `isAdmin`,
+               `registered_at` AS `registeredAt`
+        FROM `matzip`.`users`
+        WHERE BINARY `nickname` = #{nickname}
+        LIMIT 1
+    </select>
+
+    <select id="selectUserByContact" resultType="dev.itjung.matzip.entities.UserEntity">
+        SELECT `email`         AS `email`,
+               `password`      AS `password`,
+               `nickname`      AS `nickname`,
+               `contact`       AS `contact`,
+               `status`        AS `status`,
+               `admin_flag`    AS `isAdmin`,
+               `registered_at` AS `registeredAt`
+        FROM `matzip`.`users`
+        WHERE `contact` = #{contact}
+        LIMIT 1
+    </select>
+    <select id="selectRegisterContactCodeByContactCodeSalt"
+            parameterType="dev.itjung.matzip.entities.RegisterContactCodeEntity"
+            resultType="dev.itjung.matzip.entities.RegisterContactCodeEntity">
+        SELECT `index`        AS 'index',
+               `contact`      AS `contact`,
+               `code`         AS `code`,
+               `salt`         AS `salt`,
+               `created_at`   AS `createdAt`,
+               `expires_at`   AS `expiresAt`,
+               `expired_flag` AS `isExpired`
+        FROM `matzip`.`register_contact_codes`
+        WHERE BINARY `contact` = #{contact}
+          AND BINARY `code` = #{code}
+          AND BINARY `salt` = #{salt}
+        LIMIT 1
+    </select>
+    <select id="selectRegisterEmailCodeByEmailCodeSalt"
+            parameterType="dev.itjung.matzip.entities.RegisterEmailCodeEntity"
+            resultType="dev.itjung.matzip.entities.RegisterEmailCodeEntity">
+        SELECT `index`        AS 'index',
+               `email`        AS `email`,
+               `code`         AS `code`,
+               `salt`         AS `salt`,
+               `created_at`   AS `createdAt`,
+               `expires_at`   AS `expiresAt`,
+               `expired_flag` AS `isExpired`
+        FROM `matzip`.`register_email_codes`
+        WHERE BINARY `email` = #{email}
+          AND BINARY `code` = #{code}
+          AND BINARY `salt` = #{salt}
+        LIMIT 1
+    </select>
+    <update id="updateRegisterContactCode"
+            parameterType="dev.itjung.matzip.entities.RegisterContactCodeEntity">
+        UPDATE `matzip`.`register_contact_codes`
+        SET `contact`      = #{contact},
+            `code`         = #{code},
+            `salt`         = #{salt},
+            `created_at`   = #{createdAt},
+            `expires_at`   = #{expiresAt},
+            `expired_flag` = #{isExpired}
+        WHERE `index` = #{index}
+        LIMIT 1
+    </update>
+
+    <update id="updateUser"
+    parameterType="dev.itjung.matzip.entities.UserEntity">
+        UPDATE `matzip`.`users`
+        SET `password` =#{password},
+            `nickname` =#{nickname},
+            `contact` = #{contact},
+            `status` = #{status},
+            `admin_flag` = #{isAdmin},
+            `registered_at` = #{registerAt}
+        WHERE `email` = #{email}
+        LIMIT 1
+    </update>
+
+    <update id="updateRegisterEmailCode"
+            parameterType="dev.itjung.matzip.entities.RegisterEmailCodeEntity">
+        UPDATE `matzip`.`register_email_codes`
+        SET `email`        = #{email},
+            `code`         = #{code},
+            `salt`         = #{salt},
+            `created_at`   = #{createdAt},
+            `expires_at`   = #{expiresAt},
+            `expired_flag` = #{isExpired}
+        WHERE `index` = #{index}
+        LIMIT 1
+    </update>
+
+    <update id="updateRecoverContactCode"
+    parameterType="dev.itjung.matzip.entities.RecoverContactCodeEntity">
+        UPDATE `matzip`.`recover_contact_codes`
+        SET `contact` = #{contact},
+            `code` = #{code},
+            `salt` = #{salt},
+            `created_at` = #{createdAt},
+            `expires_at` = #{expiresAt},
+            `expired_flag` = #{isExpired}
+        WHERE `index` =#{index}
+        LIMIT 1
+    </update>
+
+    <select id="seletRecoverContactCodeByContactCodeSalt"
+    parameterType="dev.itjung.matzip.entities.RecoverContactCodeEntity">
+        SELECT `index`        AS 'index',
+               `contact`      AS `contact`,
+               `code`         AS `code`,
+               `salt`         AS `salt`,
+               `created_at`   AS `createdAt`,
+               `expires_at`   AS `expiresAt`,
+               `expired_flag` AS `isExpired`
+        FROM `matzip`.`register_contact_codes`
+        WHERE BINARY `contact` = #{contact}
+          AND BINARY `code` = #{code}
+          AND BINARY `salt` = #{salt}
+        LIMIT 1
+    </select>
+</mapper>
